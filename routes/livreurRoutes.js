@@ -17,7 +17,7 @@ router.get('/top', async (req, res) => {
 // (utile dans ton interface d'affectation côté admin)
 router.get('/', async (req, res) => {
   try {
-    const livreurs = await Utilisateur.find({ role: 'livreur' });
+    const livreurs = await Livreur.find();
     res.status(200).json(livreurs);
   } catch (err) {
     res.status(500).json({ message: "Erreur lors de la récupération des livreurs", err });

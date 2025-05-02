@@ -8,6 +8,10 @@ router.post('/envoyer', coliscontroller.envoyerColis);
 // Récupérer tous les colis
 router.get('/', coliscontroller.getAllColis);
 
+router.get('/get',coliscontroller.getAllColisClient);
+
+router.get('/get-colis-livreur',coliscontroller.getAllColisLivreur);
+
 // Récupérer un colis par ID
 router.get('/:id', coliscontroller.getColisById);
 

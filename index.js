@@ -49,6 +49,8 @@ app.use('/api/courriers', courrierRoutes)
 const livreurRoutes = require('./routes/livreurRoutes')
 app.use('/api/livreurs', livreurRoutes)
 
+const adminRoutes = require('./routes/adminRoutes')
+app.use('/api/admin', adminRoutes)
 // Routes clients
 const clientRoutes = require('./routes/clientsRoutes');
 app.use('/api/clients', clientRoutes)
@@ -60,7 +62,8 @@ app.use('/api/paiements', paiementRoutes)
 // Routes utilisateurs (Admin : liste, ajout, modification, suppression)
 const utilisateurRoutes = require('./routes/utilisateurRoutes')
 app.use('/api/utilisateurs', utilisateurRoutes)
-
+const ticketsRoutes = require('./routes/ticketRoutes')
+app.use('/api/tickets', ticketsRoutes)
 // Routes d'authentification (signup / login client)
 const authRoutes = require('./routes/authRoutes')
 app.use('/api/auth', authRoutes)

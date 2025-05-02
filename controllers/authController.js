@@ -6,9 +6,11 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // Inscription
 exports.signup = async (req, res) => {
   try {
-    const { name, email, phone, codePostal, password } = req.body
+    console.log('req.body',v=req.body);
+    
+    const { nom, email, phone, codePostal, password , role } = req.body
     const imageFile = req.file // the uploaded file from multer
-
+    console.log("imageFile?.filename",imageFile?.filename)
     // Check if email already exists
     const existingUser = await User.findOne({ email })
     if (existingUser) {
@@ -18,13 +20,13 @@ exports.signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10)
 
     const newUser = new User({
-      nom: name,
+      nom: nom,
       email,
       phone,
       codePostal,
       password: hashedPassword,
       image: imageFile?.filename || '', // save image file name (or URL if uploaded to cloud)
-      role: 'client',
+      role: role,
       statut: 'actif',
     })
 
@@ -46,14 +48,22 @@ exports.signup = async (req, res) => {
 //  Connexion
 exports.login = async (req, res) => {
   try {
-    const { email, motDePasse } = req.body;
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email et mot de passe requis" });
+    }
 
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
 
-    const isMatch = await bcrypt.compare(motDePasse, user.motDePasse);
+    if (!user.password) {
+      return res.status(500).json({ message: "Mot de passe manquant dans le compte utilisateur." });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Mot de passe incorrect" });
     }
@@ -80,12 +90,18 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la connexion" });
   }
 };
-exports.getCurrentUser = (req, res) => {
-  if (!req.user) {
-    return res.status(401).json({ message: 'Unauthorized' })
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password'); // Exclure le mot de passe
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+    res.status(200).json(user);
+  } catch (err) {
+    console.error('Erreur dans /me :', err);
+    res.status(500).json({ message: "Erreur serveur" });
   }
-  res.json({ user: req.user })
-}
+};
 
 exports.logoutUser = (req, res) => {
   // If you're using cookies with JWT

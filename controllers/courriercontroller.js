@@ -1,56 +1,64 @@
 const Courrier = require('../models/courrier');
 
 // Ajouter un nouveau courrier
+const { v4: uuidv4 } = require('uuid');
+
 exports.ajouterCourrier = async (req, res) => {
   try {
+    console.log(' req.body', req.body);
     const {
-      numeroSuivi,
-      expediteur,
-      destinataire,
-      adresseExp,
-      adresseDest,
+      expediteurNom,
+      expediteurNum,
+      expediteurEmail,
+      expediteurTel,
+      destinataireNom,
+      destinataireNum,
+      destinataireAdresse,
       codePostal,
-      tel,
       contenu,
-      nombrepages,
-      dateTraitement,
-      dateLivraison,
-      historique
+      client_id,
+      montant
     } = req.body;
 
+    // Vérification des champs obligatoires
     if (
-      !numeroSuivi || !expediteur || !destinataire ||
-      !adresseExp || !adresseDest || !codePostal || !tel
+      !expediteurNom || !destinataireNom ||
+      !destinataireAdresse || !codePostal || !expediteurTel
     ) {
       return res.status(400).json({ message: 'Tous les champs obligatoires ne sont pas remplis' });
     }
 
+    const nombrepages = Math.ceil((contenu?.length || 1) / 1800) || 1;
     const prix = nombrepages * 1 + 0.5;
+    const numeroSuivi = uuidv4(); // Génère un numéro unique
 
     const courrier = new Courrier({
       numeroSuivi,
-      expediteur,
-      destinataire,
-      adresseExp,
-      adresseDest,
+      expediteur: expediteurNom,
+      destinataire: destinataireNom,
+       // si besoin d'un champ expéditeur statique
+      adresseDest: destinataireAdresse,
       codePostal,
-      tel,
+      tel: expediteurTel,
       contenu,
       nombrepages,
-      prix,
+      prix:montant,
       statut: 'En attente',
       dateEnvoi: new Date(),
-      dateTraitement,
-      dateLivraison,
-      historique
+      dateTraitement: null,
+      dateLivraison: null,
+      historique: "",
+      Client:client_id
     });
 
     await courrier.save();
     res.status(201).json({ message: 'Courrier enregistré avec succès', courrier });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Erreur lors de l'enregistrement", error });
   }
 };
+
 
 // Obtenir tous les courriers
 exports.getAllCourriers = async (req, res) => {

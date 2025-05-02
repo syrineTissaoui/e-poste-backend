@@ -5,12 +5,12 @@ const utilisateurSchema = new mongoose.Schema({
   nom: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true }, // renommé pour correspondre à l'inscription
-  phone: { type: String, required: true },
+  phone: { type: String},
   codePostal: { type: String },
   image: { type: String }, // URL vers la photo de profil
   role: {
     type: String,
-    enum: ['client', 'livreur', 'support client', 'admin'],
+    enum: ['client', 'livreur', 'support-client', 'admin'],
     default: 'client',
     required: true,
   },

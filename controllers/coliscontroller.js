@@ -15,7 +15,8 @@ exports.envoyerColis = async (req, res) => {
       poids,
       dateExpedition,
       dateLivraison,
-      historique
+      historique,
+      clientId
     } = req.body;
 
     // Vérification des champs obligatoires
@@ -25,7 +26,6 @@ exports.envoyerColis = async (req, res) => {
     ) {
       return res.status(400).json({ message: 'Tous les champs requis ne sont pas remplis' });
     }
-
     const nouveauColis = new Colis({
       numeroSuivi,
       expediteur,
@@ -40,7 +40,12 @@ exports.envoyerColis = async (req, res) => {
       dateLivraison,
       historique,
       statut: 'En attente', // Valeur par défaut
-      date: new Date()
+      date: new Date(),
+      Client: clientId,
+      
+      
+      
+      
     });
 
     await nouveauColis.save();
@@ -51,6 +56,31 @@ exports.envoyerColis = async (req, res) => {
 };
 
 // Récupérer tous les colis
+
+exports.getAllColisLivreur = async (req, res) => {
+  const mongoose = require('mongoose');
+  const LivreurId = req.query.livreurId;
+  console.log('LivreurId',LivreurId)
+  try {
+    
+    const colis = await Colis.find({ livreur:LivreurId});
+    res.status(200).json(colis);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur lors de la récupération des colis", error });
+  }
+};
+      exports.getAllColisClient = async (req, res) => {
+        const mongoose = require('mongoose');
+        const clientId = req.query.clientId;
+        console.log('clientId',clientId)
+        try {
+          
+          const colis = await Colis.find({ client:clientId});
+          res.status(200).json(colis);
+        } catch (error) {
+          res.status(500).json({ message: "Erreur lors de la récupération des colis", error });
+        }
+      };
 exports.getAllColis = async (req, res) => {
   try {
     const colis = await Colis.find();
@@ -103,9 +133,9 @@ exports.deleteColis = async (req, res) => {
 exports.affecterColis = async (req, res) => {
   try {
     const { id } = req.params;
-    const { livreur } = req.body;
+    const { livreur , dateLivraison , statut } = req.body;
 
-    const colis = await Colis.findByIdAndUpdate(id, { livreur }, { new: true });
+    const colis = await Colis.findByIdAndUpdate(id, { livreur , dateLivraison , statut }, { new: true });
     if (!colis) {
       return res.status(404).json({ message: "Colis non trouvé pour l'affectation" });
     }

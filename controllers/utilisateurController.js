@@ -44,14 +44,30 @@ exports.getUtilisateurs = async (req, res) => {
 // Ajouter un utilisateur
 exports.ajouterUtilisateur = async (req, res) => {
   try {
-    const hashedPassword = await bcrypt.hash(req.body.motDePasse, 10);
-    const newUser = new Utilisateur({ ...req.body, motDePasse: hashedPassword });
+    const { nom, email, role, motDePasse , status } = req.body;
+
+    if (!nom || !email || !role || !motDePasse || !status ) {
+      return res.status(400).json({ message: 'Tous les champs sont obligatoires.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(motDePasse, 10);
+
+    const newUser = new Utilisateur({
+      nom,
+      email,
+      role,
+      password: hashedPassword,
+      status
+    });
+
     await newUser.save();
     res.status(201).json(newUser);
   } catch (err) {
+    console.error(err);
     res.status(400).json({ message: err.message });
   }
 };
+
 
 // Modifier
 exports.modifierUtilisateur = async (req, res) => {
@@ -89,6 +105,14 @@ exports.getLivreurs = async (req, res) => {
   try {
     const livreurs = await Utilisateur.find({ role: 'livreur' });
     res.json(livreurs);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+exports.getClient = async (req, res) => {
+  try {
+    const clients = await Utilisateur.find({ role: 'client' });
+    res.json(clients);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
