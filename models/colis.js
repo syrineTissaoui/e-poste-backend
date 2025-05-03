@@ -18,6 +18,10 @@ const colisSchema = new mongoose.Schema({
   dateLivraison: { type: String }, // Ex : "2025-04-25"
   description: { type: String , default: "" },
   action: { type: String , default: ""  },
+  prix: {
+    type: String,
+    required: true
+  },             // prix calculé
   historique: { type: String }, // Description libre ou tableau si besoin
   Client: {
     type: mongoose.Schema.Types.ObjectId,

@@ -13,16 +13,18 @@ exports.envoyerColis = async (req, res) => {
       tel,
       type,
       poids,
+      prix,
       dateExpedition,
       dateLivraison,
       historique,
       clientId
     } = req.body;
+    console.log('req.body',req.body)
 
     // Vérification des champs obligatoires
     if (
       !numeroSuivi || !expediteur || !destinataire ||
-      !adresseExp || !adresseDest || !codePostal || !tel
+      !adresseExp || !adresseDest || !codePostal || !tel || !prix 
     ) {
       return res.status(400).json({ message: 'Tous les champs requis ne sont pas remplis' });
     }
@@ -36,6 +38,7 @@ exports.envoyerColis = async (req, res) => {
       tel,
       type,
       poids,
+      prix:prix,
       dateExpedition,
       dateLivraison,
       historique,
