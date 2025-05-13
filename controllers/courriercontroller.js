@@ -111,6 +111,7 @@ exports.updateCourrier = async (req, res) => {
 // Supprimer un courrier
 exports.deleteCourrier = async (req, res) => {
   try {
+    console.log('-----------',req.params.id)
     const courrier = await Courrier.findByIdAndDelete(req.params.id);
     if (!courrier) {
       return res.status(404).json({ message: "Courrier introuvable" });

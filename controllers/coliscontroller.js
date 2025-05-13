@@ -122,6 +122,8 @@ exports.updateColis = async (req, res) => {
 // 🔹 Supprimer un colis
 exports.deleteColis = async (req, res) => {
   try {
+        console.log('-----------')
+
     const deleted = await Colis.findByIdAndDelete(req.params.id);
     if (!deleted) {
       return res.status(404).json({ message: "Colis non trouvé pour la suppression" });

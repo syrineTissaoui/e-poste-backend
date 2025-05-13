@@ -24,7 +24,6 @@ exports.login = async (req, res) => {
     );
 
     const { motDePasse, ...safeUser } = utilisateur._doc;
-    console.log('safeUser',safeUser)
     res.json({ token, utilisateur: utilisateur });
 
   } catch (err) {
@@ -71,14 +70,25 @@ exports.ajouterUtilisateur = async (req, res) => {
 
 
 // Modifier
+
 exports.modifierUtilisateur = async (req, res) => {
   try {
-    const utilisateur = await Utilisateur.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updates = { ...req.body };
+
+    // Only hash password if it’s being updated
+    if (updates.password) {
+      const salt = await bcrypt.genSalt(10);
+      updates.password = await bcrypt.hash(updates.password, salt);
+    }
+
+    const utilisateur = await Utilisateur.findByIdAndUpdate(req.params.id, updates, { new: true });
+
     res.json(utilisateur);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 };
+
 
 // Supprimer
 exports.supprimerUtilisateur = async (req, res) => {
