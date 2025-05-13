@@ -24,7 +24,8 @@ exports.login = async (req, res) => {
     );
 
     const { motDePasse, ...safeUser } = utilisateur._doc;
-    res.json({ token, utilisateur: safeUser });
+    console.log('safeUser',safeUser)
+    res.json({ token, utilisateur: utilisateur });
 
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur', err });

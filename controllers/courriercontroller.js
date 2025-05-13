@@ -1,4 +1,5 @@
 const Courrier = require('../models/courrier');
+const mongoose = require('mongoose');
 
 // Ajouter un nouveau courrier
 const { v4: uuidv4 } = require('uuid');
@@ -59,7 +60,18 @@ exports.ajouterCourrier = async (req, res) => {
   }
 };
 
-
+exports.getAllCourrierClient = async (req, res) => {
+        const mongoose = require('mongoose');
+        const clientId = req.query.clientId;
+        console.log('clientId',clientId)
+        try {
+          
+          const colis = await Courrier.find({ Client:clientId});
+          res.status(200).json(colis);
+        } catch (error) {
+          res.status(500).json({ message: "Erreur lors de la récupération des colis", error });
+        }
+      };
 // Obtenir tous les courriers
 exports.getAllCourriers = async (req, res) => {
   try {
@@ -113,17 +125,43 @@ exports.deleteCourrier = async (req, res) => {
 exports.affecterCourrier = async (req, res) => {
   try {
     const { id } = req.params;
-    const { livreur } = req.body;
+    const { livreur, dateLivraison, statut } = req.body;
 
-    const courrier = await Courrier.findByIdAndUpdate(id, { livreur }, { new: true });
-    if (!courrier) {
-      return res.status(404).json({ message: "Courrier non trouvé pour l'affectation" });
+
+    if (!livreur || !mongoose.Types.ObjectId.isValid(livreur)) {
+      console.log("❌ Livreur invalide !");
+      return res.status(400).json({ message: 'ID du livreur invalide' });
     }
 
-    res.status(200).json({ message: "Livreur affecté au courrier avec succès", courrier });
+    let objectId;
+    try {
+      objectId = new mongoose.Types.ObjectId(livreur);
+    } catch (err) {
+      console.error('❌ Erreur lors de la construction de l’ObjectId :', err.message);
+      return res.status(400).json({ message: 'ObjectId invalide' });
+    }
+
+    const courrier = await Courrier.findByIdAndUpdate(
+      id,
+      {
+        Livreur: objectId,
+        dateLivraison,
+        statut
+      },
+      { new: true }
+    );
+
+    if (!courrier) {
+      return res.status(404).json({ message: 'Courrier non trouvé' });
+    }
+
+    console.log('✅ Courrier mis à jour :', courrier);
+    res.status(200).json({ message: 'Affectation réussie', courrier });
   } catch (err) {
-    res.status(500).json({ message: "Erreur d'affectation du courrier", err });
+    console.error('❌ Erreur finale dans affectation :', err.message);
+    res.status(500).json({ message: "Erreur serveur", error: err.message });
   }
 };
+
 
 

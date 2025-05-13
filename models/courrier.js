@@ -18,7 +18,8 @@ const courrierSchema = new mongoose.Schema({
   historique: { type: String }, 
   description: { type: String , default: "" },
   action: { type: String , default: ""  },                   // texte libre
-  livreur: { type: mongoose.Schema.Types.ObjectId, ref: 'Livreur', default: null },
+  Livreur: { type: mongoose.Schema.Types.ObjectId, ref: 'Livreur' },
+  
   Client: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Client', // change to 'User' if your model is named differently

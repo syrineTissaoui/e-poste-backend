@@ -7,6 +7,8 @@ router.post('/envoyer', courriercontroller.ajouterCourrier);
 
 // Obtenir tous les courriers
 router.get('/', courriercontroller.getAllCourriers);
+router.get('/get',courriercontroller.getAllCourrierClient);
+
 
 // Obtenir un courrier par ID
 router.get('/:id', courriercontroller.getCourrierById);

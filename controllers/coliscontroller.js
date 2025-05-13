@@ -63,22 +63,22 @@ exports.envoyerColis = async (req, res) => {
 exports.getAllColisLivreur = async (req, res) => {
   const mongoose = require('mongoose');
   const LivreurId = req.query.livreurId;
-  console.log('LivreurId',LivreurId)
+  console.log('---------',LivreurId)
   try {
     
-    const colis = await Colis.find({ livreur:LivreurId});
+    const colis = await Colis.find({ Livreur:LivreurId});
     res.status(200).json(colis);
   } catch (error) {
     res.status(500).json({ message: "Erreur lors de la récupération des colis", error });
   }
 };
-      exports.getAllColisClient = async (req, res) => {
+exports.getAllColisClient = async (req, res) => {
         const mongoose = require('mongoose');
         const clientId = req.query.clientId;
         console.log('clientId',clientId)
         try {
           
-          const colis = await Colis.find({ client:clientId});
+          const colis = await Colis.find({ Client:clientId});
           res.status(200).json(colis);
         } catch (error) {
           res.status(500).json({ message: "Erreur lors de la récupération des colis", error });
@@ -133,18 +133,42 @@ exports.deleteColis = async (req, res) => {
 };
 
 // Affecter un livreur à un colis
+const mongoose = require('mongoose');
+
+
 exports.affecterColis = async (req, res) => {
   try {
     const { id } = req.params;
-    const { livreur , dateLivraison , statut } = req.body;
+    const { livreur, dateLivraison, statut } = req.body;
 
-    const colis = await Colis.findByIdAndUpdate(id, { livreur , dateLivraison , statut }, { new: true });
+    console.log('✅ Requête body reçue :', req.body);
+    console.log('🔍 Validation livreur ID :', !livreur || !mongoose.Types.ObjectId.isValid(livreur));
+
+    if (!livreur || !mongoose.Types.ObjectId.isValid(livreur)) {
+      return res.status(400).json({ message: 'Valid Livreur ID is required' });
+    }
+
+    const colis = await Colis.findByIdAndUpdate(
+      id,
+      { Livreur:livreur, dateLivraison:dateLivraison, statut:statut },
+      { new: true }
+    );
+
     if (!colis) {
       return res.status(404).json({ message: "Colis non trouvé pour l'affectation" });
     }
 
-    res.status(200).json({ message: "Livreur affecté au colis avec succès", colis });
+    res.status(200).json({
+      message: "✅ Livreur affecté au colis avec succès",
+      colis
+    });
+
   } catch (err) {
-    res.status(500).json({ message: "Erreur d'affectation du colis", err });
+    console.error('❌ Erreur serveur pendant l’affectation :', err);
+    res.status(500).json({
+      message: "Erreur d'affectation du colis",
+      error: err.message || err
+    });
   }
 };
+

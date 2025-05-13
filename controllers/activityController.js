@@ -97,15 +97,14 @@ exports.getRecentActivitiesClient = async (req, res) => {
     const mongoose = require('mongoose');
     const livreurId = req.query.livreurId;
    
-  console.log('!livreurId || !mongoose.Types.ObjectId.isValid(livreurId)',!livreurId || !mongoose.Types.ObjectId.isValid(livreurId))
     if (!livreurId || !mongoose.Types.ObjectId.isValid(livreurId)) {
       return res.status(400).json({ message: 'Valid Livreur ID is required' });
     }
   
     try {
       const objectId = new mongoose.Types.ObjectId(livreurId);
-      const colis = await Colis.find({ livreur: objectId });
-      const courriers = await Courrier.find({ livreur: objectId });
+      const colis = await Colis.find({ Livreur: objectId });
+      const courriers = await Courrier.find({ Livreur: objectId });
   
 
 
@@ -130,7 +129,6 @@ exports.getRecentActivitiesClient = async (req, res) => {
       // ✅ Aggregated summary
       const colisLivres = colis.filter(c => c.statut === 'Livré').length;
       const colisEnAttente = colis.filter(c => c.statut === 'En attente').length;
-  console.log('courriers',courriers)
       const courriersLivres = courriers.filter(c => c.statut === 'Livré').length;
       const courriersEnAttente = courriers.filter(c => c.statut === 'En attente').length;
   

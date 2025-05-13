@@ -1,5 +1,6 @@
 // Charger les variables d’environnement
 require('dotenv').config()
+const createAdminIfNotExists = require('./initAdmin');
 
 // Importer les modules nécessaires
 const express = require('express')
@@ -24,8 +25,10 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-  .then(() => console.log('[MongoDB] Connexion réussie à MongoDB'))
-  .catch((err) => {
+  .then( async() =>{
+    await createAdminIfNotExists();
+     console.log('[MongoDB] Connexion réussie à MongoDB')
+  }).catch((err) => {
     console.error('[MongoDB] Échec de la connexion :', err)
     process.exit(1)
   })
