@@ -18,7 +18,9 @@ const utilisateurSchema = new mongoose.Schema({
     type: String,
     enum: ['actif', 'inactif'],
     default: 'actif',
-  }
+  },
+  resetToken: { type: String },
+resetTokenExpiry: { type: Date },
 }, { timestamps: true }) // ajoute createdAt et updatedAt automatiquement
 
 module.exports = mongoose.model('Utilisateur', utilisateurSchema)
