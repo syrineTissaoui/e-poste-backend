@@ -1,4 +1,5 @@
 const Colis = require('../models/colis');
+const User = require('../models/utilisateur');
 
 //  Créer un nouveau colis
 exports.envoyerColis = async (req, res) => {
@@ -107,17 +108,48 @@ exports.getColisById = async (req, res) => {
 };
 
 // Mettre à jour un colis
+
+const Notification = require('../models/notifications');
+const sendResetEmail = require('../middlewares/sendEmail'); 
+
 exports.updateColis = async (req, res) => {
   try {
-    const updated = await Colis.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated) {
-      return res.status(404).json({ message: "Colis non trouvé pour la mise à jour" });
+    const { id } = req.params;
+    const { statut } = req.body;
+
+    const colis = await Colis.findById(id);
+    if (!colis) return res.status(404).json({ message: "Colis introuvable" });
+
+    colis.statut = statut;
+    await colis.save();
+
+    // ✅ Notification uniquement si livré
+    if (statut === "Livré") {
+      const user = await User.findById(colis.Client); // ou colis.email si tu n'utilises pas _id
+
+      const message = `Votre colis ${colis._id} a bien été livré.`;
+
+      if (user?.notificationPreferences?.push) {
+        await Notification.create({
+          titre: "Colis livré",
+          description: message,
+          destinataire: user._id,
+          date: new Date(),
+          statut: "Non lu",
+        });
+      } else if (user?.notificationPreferences?.email) {
+        await sendResetEmail(user.email, message);
+      }
     }
-    res.status(200).json({ message: "Colis mis à jour avec succès", colis: updated });
-  } catch (error) {
-    res.status(500).json({ message: "Erreur lors de la mise à jour", error });
+
+    res.json({ message: "Statut mis à jour avec succès", colis });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
+
 
 // 🔹 Supprimer un colis
 exports.deleteColis = async (req, res) => {

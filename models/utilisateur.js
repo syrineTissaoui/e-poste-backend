@@ -21,6 +21,10 @@ const utilisateurSchema = new mongoose.Schema({
   },
   resetToken: { type: String },
 resetTokenExpiry: { type: Date },
+notificationPreferences: {
+   
+    email: { type: Boolean, default: false }
+  }
 }, { timestamps: true }) // ajoute createdAt et updatedAt automatiquement
 
 module.exports = mongoose.model('Utilisateur', utilisateurSchema)
