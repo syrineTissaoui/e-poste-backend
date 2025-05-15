@@ -8,4 +8,4 @@ const ticketSchema = new mongoose.Schema({
   utilisateur: { type: mongoose.Schema.Types.ObjectId, ref: 'Utilisateur', required: true },
 });
 
-module.exports = mongoose.model('Ticket', ticketSchema);
+module.exports = mongoose.model('Ticket', ticketSchema); 
